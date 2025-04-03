@@ -17,8 +17,8 @@ class RegisterController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email:dns|max:255|unique:users',
+            'username' => 'required|string|min:5|unique:users,username',
+            'email' => 'required|string|email:dns|unique:users,email',
             'password' => 'required|string|min:5',
         ]);
 
@@ -27,6 +27,6 @@ class RegisterController extends Controller
         User::create($validatedData);
 
         session()->flash("success", "Registration successfully!");
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }

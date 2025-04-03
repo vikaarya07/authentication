@@ -15,7 +15,6 @@ class LoginController extends Controller
 
     public function authenticate(Request $request)
     {
-
         $credentials = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string'
@@ -23,28 +22,25 @@ class LoginController extends Controller
 
         $remember = $request->has('remember');
 
-        $user = User::where('username', $request->username)->first();
-
-
-
-        if ($user && Auth::attempt($credentials, $remember)) {
+        if (Auth::attempt($credentials, $remember)) {
             return redirect()->intended('/')->with('success', 'Login Successfully!');
-        } elseif (!$user) {
-            return redirect()->back()->with('error', 'User Not Found!');
-        } else {
-            return redirect()->back()->with('error', 'Login Failed!');
         }
+
+        if (User::where('username', $request->username)->exists()) {
+            return redirect()->back()->with('error', 'Username or Password Incorret!');
+        }
+
+        return redirect()->back()->with('error', 'Username or Password Incorret!');
     }
+
 
     public function logout(Request $request)
     {
-
         Auth::logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
     }
 }
